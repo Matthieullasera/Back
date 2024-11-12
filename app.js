@@ -1,9 +1,10 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const app = express();
 
-const userRoutes = require('./models/user');
-const auth = require('./models/auth');
+const stuffRoutes = require('./routes/stuff');
+const userRoutes = require('./routes/user');
 
 app.use(express.json());
 
@@ -19,54 +20,14 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/auth', userRoutes); // Routes pour l'authentification
+app.use(bodyParser.json());
+app.use('/api/stuff', stuffRoutes);
+app.use('/api/stuff', stuffRoutes);
+app.use('/api/auth', userRoutes);
 
-// Route publique pour afficher les livres sans authentification
-app.get('/api/books', (req, res, next) => {
-  const books = [
-    {
-      _id: 'book1',
-      userId: 'user12345',
-      title: 'Voyage au bout de la nuit',
-      author: 'Louis-Ferdinand Céline',
-      imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
-      year: 1932,
-      genre: 'Roman',
-      ratings: [
-        { userId: 'user67890', grade: 5 },
-        { userId: 'user54321', grade: 4 }
-      ],
-      averageRating: 4.5
-    },
-    {
-      _id: 'book2',
-      userId: 'user67890',
-      title: 'L’étranger',
-      author: 'Albert Camus',
-      imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
-      year: 1942,
-      genre: 'Roman philosophique',
-      ratings: [
-        { userId: 'user12345', grade: 4 },
-        { userId: 'user98765', grade: 5 }
-      ],
-      averageRating: 4.5
-    }
-  ];
 
-  res.status(200).json(books);
-});
-
-// Route protégée pour créer un livre (requiert l'authentification)
-app.post('/api/books', auth, (req, res, next) => {
-  delete req.body._id;
-  const thing = new Thing({
-    ...req.body,
-    userId: req.auth.userId
-  });
-  thing.save()
-    .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-    .catch(error => res.status(400).json({ error }));
-});
 
 module.exports = app;
+
+
+ 
